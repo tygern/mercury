@@ -2,8 +2,9 @@
 
 Build with [Flask](http://flask.pocoo.org/).
 
-## Setup
-- Install virtualenv and virtualenvwrapper
+## Environment
+- Install *python* and *pip* `brew install python`
+- Install *virtualenv* and *virtualenvwrapper*
 
         pip install virtualenv virtualenvwrapper
         export WORKON_HOME=~/Envs
@@ -11,12 +12,20 @@ Build with [Flask](http://flask.pocoo.org/).
         source /usr/local/bin/virtualenvwrapper.sh
         mkvirtualenv mercury
 
-- Add the following two lines to the end of `$VIRTUAL_ENV/bin/postactivate`
+- Add the following lines to the end of `$VIRTUAL_ENV/bin/postactivate`
 
         cd [PROJECT_PATH]
         export APP_SETTINGS="config.DevelopmentConfig"
+        export DATABASE_URL="postgresql://[YOUR_DB_USERNAME]pivotal@localhost/mercury"
         
 - Run `workon mercury`
+
+
+## Database
+- Create database and run migrations
+
+        createdb mercury
+        python manage.py db upgrade
 
 
 ## Development
