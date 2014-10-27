@@ -14,3 +14,11 @@ class Todo(db.Model):
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
+
+    @property
+    def serialize(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "description": self.description
+        }

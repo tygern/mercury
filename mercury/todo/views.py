@@ -1,14 +1,14 @@
-from flask import render_template, session, abort, request, flash, redirect, url_for
+from flask import session, abort, request, jsonify
 from mercury import app, db
 from mercury.todo.models import Todo
 
 
-@app.route('/')
+@app.route('/todos', methods=['GET'])
 def show_todos():
     todos = Todo.query.all()
-    return render_template('show_todos.html', todos=todos)
+    return jsonify(todo=[t.serialize for t in todos])
 
-@app.route('/add', methods=['POST'])
+@app.route('/todos', methods=['POST'])
 def add_todo():
     if not session.get('logged_in'):
         abort(401)
@@ -16,5 +16,4 @@ def add_todo():
     db.session.add(todo)
     db.session.commit()
 
-    flash('New todo was successfully posted')
-    return redirect(url_for('show_todos'))
+    return jsonify(todo.serialize)
