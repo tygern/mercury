@@ -1,12 +1,16 @@
 __author__ = 'tygern'
 
 import sqlite3
-from flask import Flask, request, session, g, redirect, url_for, \
-     abort, render_template, flash
+from flask import Flask, g
 from contextlib import closing
+import os
 
 app = Flask(__name__)
-app.config.from_object("config")
+app.config.from_object(os.environ['APP_SETTINGS'])
+
+print '*' * 80
+print 'Starting Mercury in', app.config['ENVIRONMENT']
+print '*' * 80
 
 import todo.views
 import security.views
