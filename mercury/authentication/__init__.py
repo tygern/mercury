@@ -7,10 +7,9 @@ class AuthenticationService:
 
     def login(self, username, password):
         error = None
-        if username != app.config['USERNAME']:
-            error = 'Invalid username'
-        elif password != app.config['PASSWORD']:
-            error = 'Invalid password'
+        if username != app.config['USERNAME'] or password != app.config['PASSWORD']:
+            error = 'Invalid login'
+            self.__logout_from_session()
         else:
             self.session['logged_in'] = True
 
@@ -20,10 +19,13 @@ class AuthenticationService:
         }
 
     def logout(self):
-        self.session.pop('logged_in', None)
+        self.__logout_from_session()
         return {
             "success": True
         }
 
     def logged_in(self):
-        return self.session.get('logged_in')
+        return self.session.get('logged_in') == True
+
+    def __logout_from_session(self):
+        self.session.pop('logged_in', None)
