@@ -8,4 +8,4 @@ app.config.from_object(os.environ['APP_SETTINGS'])
 db = SQLAlchemy(app)
 
 import todo.views
-import security.views
+import authentication.views
