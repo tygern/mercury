@@ -1,7 +1,7 @@
 from werkzeug.exceptions import Unauthorized
 from mercury.todo.views import show_todos, add_todo
 
-from mock import patch, MagicMock
+from mock import patch
 from mercury.todo.models import Todo
 from tests import MercuryTestCase
 
@@ -12,7 +12,13 @@ class TestTodoViews(MercuryTestCase):
         self.todo_service_patcher = patch('mercury.todo.views.todo_service')
         self.mock_todo_service = self.todo_service_patcher.start()
 
+        self.authentication_service_patcher = patch('mercury.todo.views.authentication_service')
+        self.mock_authentication_service = self.authentication_service_patcher.start()
+        attrs = {"logged_in.return_value": True}
+        self.mock_authentication_service.configure_mock(**attrs)
+
     def tearDown(self):
+        self.authentication_service_patcher.stop()
         self.todo_service_patcher.stop()
 
     @patch('mercury.todo.views.serialize_list')
@@ -27,12 +33,11 @@ class TestTodoViews(MercuryTestCase):
         self.assertEquals(result, ['todo'])
 
     @patch('mercury.todo.views.request')
-    @patch('mercury.todo.views.session')
     @patch('mercury.todo.views.serialize')
-    def test_add_todo(self, mock_serialize, mock_session, mock_request):
+    def test_add_todo(self, mock_serialize, mock_request):
         self.mock_todo_service.create.return_value = Todo('test', 'todo')
+
         mock_serialize.return_value = 'todo'
-        mock_session.get = MagicMock(return_value=True)
         mock_request.form = {"title": "new todo", "description": "really cool"}
 
         result = add_todo()
@@ -42,7 +47,7 @@ class TestTodoViews(MercuryTestCase):
 
     @patch('mercury.todo.views.session')
     def test_add_todo_logged_out(self, mock_session):
-        mock_session.get = MagicMock(return_value=False)
+        attrs = {"logged_in.return_value": False}
+        self.mock_authentication_service.configure_mock(**attrs)
 
         self.assertRaises(Unauthorized, add_todo)
-        mock_session.get.assert_called_with('logged_in')

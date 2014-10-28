@@ -24,3 +24,6 @@ class AuthenticationService:
         return {
             "success": True
         }
+
+    def logged_in(self):
+        return self.session.get('logged_in')
