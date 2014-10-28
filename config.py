@@ -28,6 +28,7 @@ class DevelopmentConfig(Config):
     DEBUG = True
 
 
-class TestingConfig(Config):
+class TestConfig(Config):
     ENVIRONMENT = 'test'
     TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'postgresql://pivotal@localhost/mercury_test'

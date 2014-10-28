@@ -19,6 +19,7 @@ Build with [Flask](http://flask.pocoo.org/).
         export DATABASE_URL="postgresql://[YOUR_DB_USERNAME]pivotal@localhost/mercury"
         
 - Run `workon mercury`
+- Use `nosetests` to run tests.
 
 
 ## Database

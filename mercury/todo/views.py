@@ -6,7 +6,7 @@ from mercury.todo.models import Todo
 @app.route('/todos', methods=['GET'])
 def show_todos():
     todos = Todo.query.all()
-    return jsonify(todo=[t.serialize for t in todos])
+    return jsonify(todos=[t.serialize for t in todos])
 
 @app.route('/todos', methods=['POST'])
 def add_todo():
