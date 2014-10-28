@@ -1,24 +1,18 @@
-from flask import request, session, flash, jsonify
+from flask import request, jsonify
 from mercury import app
+from mercury.services import authentication_service
 
 
 @app.route('/login', methods=['POST'])
 def login():
-    error = None
-    if request.form['username'] != app.config['USERNAME']:
-        error = 'Invalid username'
-    elif request.form['password'] != app.config['PASSWORD']:
-        error = 'Invalid password'
-    else:
-        session['logged_in'] = True
+    login_result = authentication_service.login(request.form['username'], request.form['password'])
 
-    return jsonify({
-        "success": error is None,
-        "message": error
-    })
+
+    print login_result
+
+    return jsonify(login_result)
 
 
 @app.route('/logout')
 def logout():
-    session.pop('logged_in', None)
-    return {"success": True}
+    return jsonify(authentication_service.logout())

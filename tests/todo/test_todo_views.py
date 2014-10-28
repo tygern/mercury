@@ -33,16 +33,16 @@ class TestTodoViews(MercuryTestCase):
         self.mock_todo_service.create.return_value = Todo('test', 'todo')
         mock_serialize.return_value = 'todo'
         mock_session.get = MagicMock(return_value=True)
-        mock_request.form.return_value({"title": "new todo", "description": "really cool"})
+        mock_request.form = {"title": "new todo", "description": "really cool"}
 
         result = add_todo()
 
-        print result
-
         self.assertEquals(result, 'todo')
+        self.mock_todo_service.create.assert_called_with("new todo", "really cool")
 
     @patch('mercury.todo.views.session')
     def test_add_todo_logged_out(self, mock_session):
         mock_session.get = MagicMock(return_value=False)
 
         self.assertRaises(Unauthorized, add_todo)
+        mock_session.get.assert_called_with('logged_in')
