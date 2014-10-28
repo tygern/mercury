@@ -1,19 +1,18 @@
 from flask import session, abort, request, jsonify
-from mercury import app, db
-from mercury.todo.models import Todo
+from mercury import app
+from mercury.todo.todo_service import TodoService
 
 
 @app.route('/todos', methods=['GET'])
 def show_todos():
-    todos = Todo.query.all()
+    todos = TodoService().find_all()
     return jsonify(todos=[t.serialize for t in todos])
 
 @app.route('/todos', methods=['POST'])
 def add_todo():
     if not session.get('logged_in'):
         abort(401)
-    todo = Todo(request.form['title'], request.form['description'])
-    db.session.add(todo)
-    db.session.commit()
+
+    todo = TodoService().create(request.form['title'], request.form['description'])
 
     return jsonify(todo.serialize)

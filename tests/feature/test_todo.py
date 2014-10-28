@@ -6,9 +6,9 @@ class TodoTest(MercuryAppTestCase):
 
     def test_todos(self):
         self.login('admin', 'default')
-        createResponse = self.client.post("/todos", data={"title": "hello", "description": "world"})
+        create_response = self.client.post("/todos", data={"title": "hello", "description": "world"})
 
-        self.assertEquals(createResponse.status, '200 OK')
+        self.assertEquals(create_response.status, '200 OK')
 
         response = self.client.get("/todos")
         response_json = json.loads(response.data)
