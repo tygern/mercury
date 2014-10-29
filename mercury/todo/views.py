@@ -16,4 +16,6 @@ def add_todo():
         abort(401)
 
     todo = todo_service.create(title=request.form['title'], description=request.form['description'])
-    return serialize(todo)
+    response = serialize(todo)
+    response.status_code = 201
+    return response

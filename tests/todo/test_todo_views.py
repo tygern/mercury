@@ -1,7 +1,7 @@
 from werkzeug.exceptions import Unauthorized
 from mercury.todo.views import show_todos, add_todo
 
-from mock import patch
+from mock import patch, MagicMock
 from mercury.todo.models import Todo
 from tests import MercuryTestCase
 
@@ -37,12 +37,15 @@ class TestTodoViews(MercuryTestCase):
     def test_add_todo(self, mock_serialize, mock_request):
         self.mock_todo_service.create.return_value = Todo('test', 'todo')
 
-        mock_serialize.return_value = 'todo'
+        response = MagicMock()
+
+        mock_serialize.return_value = response
         mock_request.form = {"title": "new todo", "description": "really cool"}
 
         result = add_todo()
 
-        self.assertEquals(result, 'todo')
+        self.assertEquals(result, response)
+        self.assertEquals(result.status_code, 201)
         self.mock_todo_service.create.assert_called_with(title="new todo", description="really cool")
 
     def test_add_todo_logged_out(self):

@@ -15,4 +15,4 @@ class TodoTest(MercuryAppTestCase):
         self.assertTrue(login_response_json['success'])
 
         create_response = self.client.post("/todos", data={"title": "hello", "description": "world"})
-        self.assertEquals(create_response.status, '200 OK')
+        self.assertEquals(create_response.status, '201 CREATED')
