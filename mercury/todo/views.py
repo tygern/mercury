@@ -15,5 +15,5 @@ def add_todo():
     if not authentication_service.logged_in():
         abort(401)
 
-    todo = todo_service.create(request.form['title'], request.form['description'])
+    todo = todo_service.create(title=request.form['title'], description=request.form['description'])
     return serialize(todo)

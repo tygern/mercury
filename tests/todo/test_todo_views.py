@@ -43,7 +43,7 @@ class TestTodoViews(MercuryTestCase):
         result = add_todo()
 
         self.assertEquals(result, 'todo')
-        self.mock_todo_service.create.assert_called_with("new todo", "really cool")
+        self.mock_todo_service.create.assert_called_with(title="new todo", description="really cool")
 
     @patch('mercury.todo.views.session')
     def test_add_todo_logged_out(self, mock_session):
