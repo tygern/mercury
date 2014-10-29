@@ -45,8 +45,7 @@ class TestTodoViews(MercuryTestCase):
         self.assertEquals(result, 'todo')
         self.mock_todo_service.create.assert_called_with(title="new todo", description="really cool")
 
-    @patch('mercury.todo.views.session')
-    def test_add_todo_logged_out(self, mock_session):
+    def test_add_todo_logged_out(self):
         attrs = {"logged_in.return_value": False}
         self.mock_authentication_service.configure_mock(**attrs)
 
