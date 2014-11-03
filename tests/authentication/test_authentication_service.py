@@ -1,43 +1,65 @@
+from mock import MagicMock
 from mercury.authentication import AuthenticationService
 from tests import MercuryTestCase
 
 
 class TestAuthenticationService(MercuryTestCase):
-    def test_logged_in(self):
-        authentication_service = AuthenticationService({'logged_in': True})
+    def setUp(self):
+        self.session = {}
+        self.g = MagicMock()
+        self.oid = MagicMock()
+        self.oid.try_login = MagicMock()
+        self.user_service = MagicMock()
+        self.user_service.find_by = MagicMock()
 
-        self.assertEquals(authentication_service.logged_in(), True)
+    def test_external_login(self):
+        AuthenticationService(self.session, self.g, self.oid, self.user_service).external_login()
 
-    def test_logged_in_logged_out(self):
-        authentication_service = AuthenticationService({})
-
-        self.assertEquals(authentication_service.logged_in(), False)
-
-    def test_logout(self):
-        session = {'logged_in': True}
-        AuthenticationService(session).logout()
-
-        self.assertEquals(session.get('logged_in'), None)
+        self.oid.try_login.assert_called_with('https://www.google.com/accounts/o8/id',
+                                              ask_for=['email', 'nickname'], ask_for_optional=['fullname'])
 
     def test_login(self):
-        session = {}
-        result = AuthenticationService(session).login('admin', 'default')
+        self.session['openid'] = None
 
-        self.assertEquals(session.get('logged_in'), True)
-        self.assertEquals(result['success'], True)
+        user = MagicMock()
+        user.openid = '1234'
+        self.g.user = None
 
-    def test_login_bad_username(self):
-        session = {'logged_in': 'anything'}
-        result = AuthenticationService(session).login('badUsername', 'default')
+        AuthenticationService(self.session, self.g, self.oid, self.user_service).login(user)
 
-        self.assertEquals(session.get('logged_in'), None)
-        self.assertEquals(result['success'], False)
-        self.assertEquals(result['message'], 'Invalid login')
+        self.assertEquals(self.session['openid'], '1234')
+        self.assertEquals(self.g.user, user)
 
-    def test_login_bad_password(self):
-        session = {'logged_in': 'anything'}
-        result = AuthenticationService(session).login('admin', 'badPassword')
+    def test_logout(self):
+        self.session['openid'] = '1234'
+        self.g.user = 'user'
 
-        self.assertEquals(session.get('logged_in'), None)
-        self.assertEquals(result['success'], False)
-        self.assertEquals(result['message'], 'Invalid login')
+        AuthenticationService(self.session, self.g, self.oid, self.user_service).logout()
+
+        self.assertFalse('openid' in self.session)
+        self.assertIsNone(self.g.user)
+
+    def test_logged_in_true(self):
+        self.g.user = 'user'
+        authentication_service = AuthenticationService(self.session, self.g, self.oid, self.user_service)
+        self.assertTrue(authentication_service.logged_in())
+
+    def test_logged_in_false(self):
+        self.g.user = None
+        authentication_service = AuthenticationService(self.session, self.g, self.oid, self.user_service)
+        self.assertFalse(authentication_service.logged_in())
+
+    def test_set_current_user_logged_out(self):
+        self.g.user = 'user'
+        AuthenticationService(self.session, self.g, self.oid, self.user_service).set_current_user()
+        self.assertIsNone(self.g.user)
+
+    def test_set_current_user_logged_in(self):
+        self.session['openid'] = '1234'
+        self.g.user = None
+        self.user_service.find_by.return_value = 'user'
+
+        AuthenticationService(self.session, self.g, self.oid, self.user_service).set_current_user()
+
+        self.assertEquals(self.g.user, 'user')
+        self.user_service.find_by.assert_called_with(openid='1234')

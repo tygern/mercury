@@ -12,10 +12,10 @@ class TestTodoViews(MercuryTestCase):
         self.todo_service_patcher = patch('mercury.todo.views.todo_service')
         self.mock_todo_service = self.todo_service_patcher.start()
 
-        self.authentication_service_patcher = patch('mercury.todo.views.authentication_service')
+        self.authentication_service_patcher = patch('mercury.control.authentication_service')
         self.mock_authentication_service = self.authentication_service_patcher.start()
-        attrs = {"logged_in.return_value": True}
-        self.mock_authentication_service.configure_mock(**attrs)
+
+        self.mock_authentication_service.logged_in.return_value = True
 
     def tearDown(self):
         self.authentication_service_patcher.stop()
@@ -49,7 +49,6 @@ class TestTodoViews(MercuryTestCase):
         self.mock_todo_service.create.assert_called_with(title="new todo", description="really cool")
 
     def test_add_todo_logged_out(self):
-        attrs = {"logged_in.return_value": False}
-        self.mock_authentication_service.configure_mock(**attrs)
+        self.mock_authentication_service.logged_in.return_value = False
 
         self.assertRaises(Unauthorized, add_todo)

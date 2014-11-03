@@ -1,0 +1,16 @@
+<!doctype html>
+<title>{% block title %}Welcome{% endblock %} | Mercury</title>
+{#<link rel=stylesheet type=text/css href="{{ url_for('static',#}
+{#  filename='style.css') }}">#}
+<h1>Mercury</h1>
+<ul class=navigation>
+  {% if g.user %}
+  <li><a href="{{ url_for('logout') }}">sign out [{{ g.user.name }}]</a></li>
+  {% else %}
+  <li><a href="{{ url_for('login') }}">sign in</a></li>
+  {% endif %}
+</ul>
+{% for message in get_flashed_messages() %}
+  <p class=message>{{ message }}
+{% endfor %}
+{% block body %}{% endblock %}

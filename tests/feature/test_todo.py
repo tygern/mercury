@@ -1,11 +1,12 @@
 import json
+
 from tests import MercuryAppTestCase
 
 
 class TodoTest(MercuryAppTestCase):
 
     def test_todos(self):
-        self.login('admin', 'default')
+        self.login()
         create_response = self.client.post("/todos", data={"title": "hello", "description": "world"})
 
         self.assertEquals(create_response.status, '201 CREATED')

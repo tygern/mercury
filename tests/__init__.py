@@ -1,5 +1,6 @@
 from unittest import TestCase
 from mercury import db, app
+from mercury.user.models import User
 
 
 class MercuryTestCase(TestCase):
@@ -9,7 +10,6 @@ class MercuryTestCase(TestCase):
 class MercuryAppTestCase(MercuryTestCase):
 
     def _create_app(self):
-        # app = Flask(__name__)
         app.config.from_object("config.TestConfig")
         app.config['LIVESERVER_PORT'] = 8943
         app.config['SERVER_NAME'] = 'localhost:8943'
@@ -30,5 +30,14 @@ class MercuryAppTestCase(MercuryTestCase):
         db.drop_all()
         self.app_context.pop()
 
-    def login(self, username=None, password=None):
-        return self.client.post('/login', data={'username': username, 'password': password})
+    def login(self):
+        user = User("Fred", "fred@example.com", "http://www.example.com/some/open/id/1234")
+        db.session.add(user)
+        db.session.commit()
+
+        with self.client.session_transaction() as session:
+            session['openid'] = user.openid
+
+    def logout(self):
+        with self.client.session_transaction() as session:
+            session.pop('openid', None)
